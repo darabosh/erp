@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from database.models import Product, Category, Facility, FacilityInventory, Order, OrderItem
+from database.models import Product, Category, Facility, FacilityInventory, InventoryItem, Order, OrderItem
 from .forms import ProductForm, CategoryForm, FacilityForm, FacilityInventoryForm, OrderForm, OrderItemForm
+from django.db.models import Sum
 
 def product_detail(request, product_id):
     product = Product.objects.get(pk=product_id)
@@ -94,8 +95,13 @@ def facility_list(request):
     return render(request, 'facility_list.html', {'facilitys': facilitys})
 
 def product_list(request):
+
     # Retrieve a list of all products from the database
     products = Product.objects.all()
+    ord = Order.objects.all()
+
+    total_order_value = ord[0].orderitem_set.aggregate(total=Sum('subtotal'))['total']
+    print(total_order_value)
 
     # You can perform additional logic here if needed
 
